@@ -1,23 +1,49 @@
-
+;Global Variables
+(defvar *missionaries*)
+(defvar *cannibals*)
 
 ;main program
-(defun m-c ( args )
+(defun m-c ( )
 ;if args not equal to 2 return
+	(cond
+		((= (length *args*) 2) 
+		;initializes globals
+			(setf *missionaries* (parse-integer (car *args*)) 
+			*cannibals* (parse-integer (cdr *args*))) 
+		;or print usage
+		(t
+			(format t "~%Missionary vs Cannibal problem~%")
+			(format t "---------- -- -------- -------~%~%")
+			(format t "Usage: (m-c missionaries cannibals)~%")
+			(format t "	missionaries - number of missionaries trying to cross~%")
+			(format t "	cannibals    - number of cannibals trying to cross~%~%")
+			(error "Incorrect number of command line arguments~%~%")
+		)
+	)
+	
+;initializes globals
+	(setf *missionaries* (parse-integer (car *args*)) 
+			*cannibals* (parse-integer (cdr *args*)))
 
 
 ;if cannibals greater than missionaries return
-
+	(cond
+		((< (car args) (cdr args)) (error 
+					"The missionaries have been eaten")) 
+	)
 
 ;print out top of table
+	(format t 
+	"left bank      right bank      canoe      last move
+	---------      ----------      -----      ---------"
+	)
 
-(setf searchInfo ((con args) (cdr args) nil nil))
-;start depth first search on successors using args as start possition
-(dfs (searchInfo))
+	(setf searchInfo (*missionaries* *cannibals* nil nil))
+;start depth first search on successors using args as start position
+	(dfs (searchInfo))
 
 
 ;return
-
-
 )
 
 
