@@ -27,7 +27,8 @@
 ;Missionaries and Cannibals problem
 (defun m-c (missionaries cannibals)
 	;check for unsolvable problem instance
-	(when (< missionaries cannibals)(return-from m-c "Too few missionaries!"))
+	(when (and (< missionaries cannibals) (not (equalp missionaries 0))
+		(return-from m-c "Too few missionaries!"))
 
 	;initialize global variables
 	(setq *missionaries* missionaries)
@@ -67,13 +68,30 @@
 		(format t "Boat: ~S~%" boat)
 		(format t "Succs: ~S~%" succs)
 
-		(cond
-			((and (equalp miss 2) (equal cann 0) (equal boat 0)))
+#|		(cond
+			((and (equalp miss 2) (equalp cann 0) (equalp boat 0))
 				(setq correct-path (first succs))
-				(return-from generate-successors))
-		)
+				(return-from generate-successors)
+			)
+			((and (equalp miss 0) (equalp cann 2) (equalp boat 0))
+				(setq correct-path (first succs))
+				(return-from generate-successors)
+			)
+			((and (equalp miss 1) (equalp cann 1) (equalp boat 0))
+				(setq correct-path (first succs))
+				(return-from generate-successors)
+			)
+			((and (equalp miss 1) (equalp cann 0) (equalp boat 0))
+				(setq correct-path (first succs))
+				(return-from generate-successors)
+			)
+			((and (equalp miss 0) (equalp cann 1) (equalp boat 0))
+				(setq correct-path (first succs))
+				(return-from generate-successors)
+			)
+		)|#
 
-		;move 2 missionaries
+		#|;move 2 missionaries
 		(when (and (eql boat 0) (>= miss 2))
 			(setq succs (cons (list (- miss 2) cann 1) succs))
 		(format t "Moving 2 missionaries: ~S~%" succs))
@@ -103,11 +121,12 @@
 
 		;return list of successors, without duplicates
 		(remove-duplicates succs :test #'equal)
+|#
 		(nreverse succs)
 		(format t "Reversed succs: ~S~%" succs)
 		(format t "First succs ~S~%" (first succs))
 		(format t "What is in correct path ~S~%" correct-path)
-		(loop while (or 
+		#|(loop while (or 
 				(not (equalp goal-state (first succs)))
 				(not done)
 			    )
@@ -123,7 +142,7 @@
 				)
 				(t (pop succs))
 			)
-		)
+		)|#
 		(setq correct-path (first succs))
 		(return-from generate-successors)
 		(setf done t)
