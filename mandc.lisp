@@ -35,7 +35,6 @@
 	(setq *cannibals* cannibals)
 	;Have we reached the goal? (all missionaries and cannibals on the right bank)
 	(setf goal-state '(0 0 1))
-	(setf right-bank '(0 0))
 
 	;Solve missionaries and cannibals problem using DFS
         (setf start-state '(0 0 0))
@@ -49,7 +48,7 @@
         (format t "Start-state ~S~%" start-state)
 	(setf correct-path (list start-state))
 	(cond 
-		((generate-successors start-state)
+		((generate-left-bank start-state)
 			(format t "Success!~%")
 			(format t "Path: ~S~%" correct-path))
 		(t
@@ -62,95 +61,144 @@
 	(values)
 )
 
-;generate-successors returns a list of successor to the current state.
-(defun generate-successors (state)
+;generate-left-bank returns a list of successor to the current state.
+(defun generate-left-bank (state)
 	;define local variables
-	(let (m1 c1 b1 (miss (first state)) (cann (second state)) (boat (third state)) 
-		(successors nil))
+	(let (m c b (miss (first state)) (cann (second state)) (boat (third state)) 
+		(left-bank nil))
 
 		(setf done nil)
 
 		;(format t "Boat: ~S~%" boat)
-		;(format t "successors: ~S~%" successors)
+		;(format t "left-bank: ~S~%" left-bank)
 		;(format t "correct-path ~S~%" correct-path)
 
+		(format t "before move 2 missionaries")
+
 		;move 2 missionaries
-		(when (and (= boat 0)(>= miss 2))
-			(setq successors (cons (list (- miss 2) cann 1) successors))
-			(setq (nth 0 right-bank) (+ (first right-bank) 2))
-		(format t "Moving 2 missionaries: ~S~%" successors)
+		(cond ((and (= boat 0)(>= miss 2))
+			(setq left-bank  (cons (list (- miss 2) cann 1) left-bank))
+			(setq right-bank 
+				(cons 
+					(list (+ 2 (first (first right-bank))) 
+					(- *cannibals* cann)
+				) right-bank)
+			)
+		(format t "Moving 2 missionaries: ~S~%" left-bank)
 		(format t "Right-bank: ~S~%" right-bank)
-		)
-		
+		))
+
+		(format t "asdfghj move 2 missionaries")
+
 		;move 2 cannibals
-		(when (and (= boat 0) (>= cann 2))
-			(setq successors (cons (list miss (- cann 2) 1) successors))
-			(setq (nth 1 right-bank) (+ (second right-bank) 2))
-		(format t "Moving 2 cannibals: ~S~%" successors)
-		(format t "Right-bank: ~S~%" right-bank))
+		(cond ((and (= boat 0) (>= cann 2))
+			(setq left-bank  (cons (list miss (- cann 2) 1) left-bank))
+			(setq right-bank 
+				(cons 
+					(list (- *missionaries* miss) 
+					(+ 2 (second (first right-bank)))
+				) right-bank)
+			)
+		(format t "Moving 2 cannibals: ~S~%" left-bank)
+		(format t "Right-bank: ~S~%" right-bank)
+		))
 
 		;move 1 of each
-		(when (and (= boat 0) (>= miss 1)(>= cann 1))
-			(setq successors 
-				(cons (list (decf miss) (decf cann) 1) successors))
-			(setq (nth 0 right-bank) (+ (first right-bank) 1))
-			(setq (nth 1 right-bank) (+ (first right-bank) 1))
-		(format t "Moving 1 of each: ~S~%" successors)
-		(format t "Right-bank: ~S~%" right-bank))
+		(cond ((and (= boat 0) (>= miss 1)(>= cann 1))
+			(setq left-bank 
+				(cons (list (decf miss) (decf cann) 1) left-bank))
+			(setq right-bank 
+				(cons 
+					(list (+ 1 (first (first right-bank))) 
+					(+ 1 (second (first right-bank)))
+				) right-bank)
+			)
+		(format t "Moving 1 of each: ~S~%" left-bank)
+		(format t "Right-bank: ~S~%" right-bank)
+		))
 
 		;move 1 missionary
-		(when (and (= boat 0)(>= miss 1))
-			(setq successors (cons (list (- miss 1) cann 1) successors))
-			(setq (nth 0 right-bank) (+ (first right-bank) 1))
-		(format t "Moving 1 missionary: ~S~%" successors)
-		(format t "Right-bank: ~S~%" right-bank))
+		(cond ((and (= boat 0)(>= miss 1))
+			(setq left-bank (cons (list (- miss 1) cann 1) left-bank))
+			(setq right-bank 
+				(cons 
+					(list (+ 1 (first (first right-bank))) 
+					(- *cannibals* cann)
+				) right-bank)
+			)
+		(format t "Moving 1 missionary: ~S~%" left-bank)
+		(format t "Right-bank: ~S~%" right-bank)
+		))
 
 		;move 1 cannibal
-		(when (and (= boat 0) (>= cann 1))
-			(setq successors (cons (list miss (- cann 1) 1) successors))
-			(setq (nth 1 right-bank) (+ (first right-bank) 1))
-		(format t "Moving 1 cannibal: ~S~%" successors)
-		(format t "Right-bank: ~S~%" right-bank))
+		(cond ((and (= boat 0) (>= cann 1))
+			(setq left-bank (cons (list miss (- cann 1) 1) left-bank))
+			(setq right-bank 
+				(cons 
+					(list (- *missionaries* miss) 
+					(+ 1 (second (first right-bank)))
+				) right-bank)
+			)
+		(format t "Moving 1 cannibal: ~S~%" left-bank)
+		(format t "Right-bank: ~S~%" right-bank)
+		))
 
 		;move 1 missionary back
-		(when (and (= boat 1) (> *missionaries* (first state)))
-			(setq successors (cons (list (incf miss) cann 0) successors))
-			(setq (nth 0 right-bank) (- (first right-bank) 1))
-		(format t "Moving 1 missionary back: ~S~%" successors)
-		(format t "Right-bank: ~S~%" right-bank))
+		(cond ((and (= boat 1) (> *missionaries* (first state)))
+			(setq left-bank (cons (list (incf miss) cann 0) left-bank))
+			(setq right-bank 
+				(cons 
+					(list (+ 1 (first (first right-bank))) 
+					(- *cannibals* cann)
+				) right-bank)
+			)
+		(format t "Moving 1 missionary back: ~S~%" left-bank)
+		(format t "Right-bank: ~S~%" right-bank)
+		))
 
 		;move 1 cannibal back
-		(when (and (= boat 1) (> *cannibals* (second state)))
-			(setq successors (cons (list miss (incf cann) 0) successors))
-			(setq (nth 1 right-bank) (+ (first right-bank) 1))
-		(format t "Moving 1 cannibals back: ~S~%" successors)
-		(format t "Right-bank: ~S~%" right-bank))
+		(cond (and (= boat 1) (> *cannibals* (second state)))
+			(setq left-bank (cons (list miss (incf cann) 0) left-bank))
+			(setq right-bank 
+				(cons 
+					(list (- *missionaries* miss) 
+					(- 1 (second (first right-bank)))
+				) right-bank)
+			)
+		(format t "Moving 1 cannibals back: ~S~%" left-bank)
+		(format t "Right-bank: ~S~%" right-bank)
+		))
 
 		;move 1 of each back
-		(when (and (= boat 1) 
+		(cond ((and (= boat 1) 
 			(> *missionaries* (first state)) 
 			(> *cannibals* (second state)))
-				(setq successors 
-					(cons (list (decf miss) (decf cann) 1) successors))
-			(setq (nth 0 right-bank) (- (first right-bank) 1))
-			(setq (nth 1 right-bank) (- (first right-bank) 1))
-		(format t "Moving 1 of each back: ~S~%" successors)
-		(format t "Right-bank: ~S~%" right-bank))
+				(setq left-bank 
+					(cons (list (decf miss) (decf cann) 1) left-bank))
+				(setq right-bank 
+					(cons 
+						(list (- 1 (first (first right-bank))) 
+						(- 1 (second (first right-bank)))
+					) right-bank)
+				)
+		(format t "Moving 1 of each back: ~S~%" left-bank)
+		(format t "Right-bank: ~S~%" right-bank)
+		))
 
-		;return list of successors, without duplicates
-		(remove-duplicates successors :test #'equal)
+		;return list of left-bank, without duplicates
+		(remove-duplicates left-bank :test #'equal)
 
-		(nreverse successors)
-		;(format t "Reversed successors: ~S~%" successors)
-		;(format t "First successors ~S~%" (first successors))
+		(nreverse left-bank)
+		;(format t "Reversed left-bank: ~S~%" left-bank)
+		;(format t "First left-bank ~S~%" (first left-bank))
 		;(format t "What is in correct path ~S~%" correct-path)
 		(loop while (and 
-				(not (equal goal-state (first successors)))
+				(not (equal goal-state (first left-bank)))
 				(not done)
 			    )
 					 do
-			(setf miss (first (first successors)))
-			(setf cann (second (first successors)))
+			(setf miss (first (first left-bank)))
+			(setf cann (second (first left-bank)))
 			;(format t "Miss: ~S~%" miss)
 			;(format t "Cann: ~S~%" cann)
 			(cond 
@@ -158,15 +206,16 @@
 					(and (< (first (first right-bank))
 						(second (first right-bank)))
 						(not (= (first (first right-bank)) 0))
-					(pop successors))
+					(pop left-bank))
 				)
-				(t (nconc correct-path (list (first successors)))
+				(t (nconc correct-path (list (first left-bank)))
 					(setq done 
-						(generate-successors (first successors)))
+						(generate-left-bank (first left-bank)))
+				)
 			)
-			(when (eq successors NIL) (return-from generate-successors NIL))
+			(when (eq left-bank NIL) (return-from generate-left-bank NIL))
 		)
-		(return-from generate-successors 1)
+		(return-from generate-left-bank 1)
 	)	
 )
 
