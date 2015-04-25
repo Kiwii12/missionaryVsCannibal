@@ -27,7 +27,7 @@
 ;Missionaries and Cannibals problem
 (defun m-c (missionaries cannibals)
 	;check for unsolvable problem instance
-	(when (and (< missionaries cannibals) (not (equalp missionaries 0))
+	(when (and (< missionaries cannibals) (not (equalp missionaries 0)))
 		(return-from m-c "Too few missionaries!"))
 
 	;initialize global variables
@@ -44,6 +44,7 @@
         (format t "Missionaries ~S~%" missionaries)
         (format t "Cannibals ~S~%" cannibals)
         (format t "Start-state ~S~%" start-state)
+	(setf correct-path (list start-state))
 	(generate-successors start-state)
 	(format t "Success!~%")
 	(format t "Path: ~S~%" correct-path)
@@ -55,97 +56,102 @@
 ;Have we reached the goal? (all missionaries and cannibals on the right bank)
 (setf goal-state '(0 0 1))
 
-(setf correct-path ())
-
 ;generate-successors returns a list of successor to the current state.
 (defun generate-successors (state)
 	;define local variables
 	(let (m1 c1 b1 (miss (first state)) (cann (second state)) (boat (third state)) 
-		(succs nil))
+		(successors nil))
 
 		(setf done nil)
 
-		(format t "Boat: ~S~%" boat)
-		(format t "Succs: ~S~%" succs)
+		;(format t "Boat: ~S~%" boat)
+		;(format t "successors: ~S~%" successors)
+		;(format t "correct-path ~S~%" correct-path)
 
-#|		(cond
-			((and (equalp miss 2) (equalp cann 0) (equalp boat 0))
-				(setq correct-path (first succs))
-				(return-from generate-successors)
-			)
-			((and (equalp miss 0) (equalp cann 2) (equalp boat 0))
-				(setq correct-path (first succs))
-				(return-from generate-successors)
-			)
-			((and (equalp miss 1) (equalp cann 1) (equalp boat 0))
-				(setq correct-path (first succs))
-				(return-from generate-successors)
-			)
-			((and (equalp miss 1) (equalp cann 0) (equalp boat 0))
-				(setq correct-path (first succs))
-				(return-from generate-successors)
-			)
-			((and (equalp miss 0) (equalp cann 1) (equalp boat 0))
-				(setq correct-path (first succs))
-				(return-from generate-successors)
-			)
-		)|#
-
-		#|;move 2 missionaries
-		(when (and (eql boat 0) (>= miss 2))
-			(setq succs (cons (list (- miss 2) cann 1) succs))
-		(format t "Moving 2 missionaries: ~S~%" succs))
+		;move 2 missionaries
+		(when (and 
+				(eql boat 0) 
+				(>= miss 2) 
+				(or 
+					( >= 2 (- *cannibals* cann )) 
+					( > (- *missionaries* miss) 0) 
+		      )
+			(setq successors (cons (list (- miss 2) cann 1) successors))
+		(format t "Moving 2 missionaries: ~S~%" successors))
 		
 		;move 2 cannibals
 		(when (and (eql boat 0) (>= cann 2))
-			(setq succs (cons (list miss (- cann 2) 1) succs))
-		(format t "Moving 2 cannibals: ~S~%" succs))
+			(setq successors (cons (list miss (- cann 2) 1) successors))
+		(format t "Moving 2 cannibals: ~S~%" successors))
 
 		;move 1 of each
 		(when (and (eql boat 0) (>= miss 1)(>= cann 1))
-			(setq succs (cons (list (decf miss) (decf cann) 1) succs))
-		(format t "Moving 1 of each: ~S~%" succs))
+			(setq successors 
+				(cons (list (decf miss) (decf cann) 1) successors))
+		(format t "Moving 1 of each: ~S~%" successors))
 
 		;move 1 missionary
+		(when (and 
+			(eql boat 0) 
+			(>= miss 1)
+				(or 
+					( >= 1 (- *cannibals* cann )) 
+					( > (- *missionaries* miss) 0) 
+		      )
+			(setq successors (cons (list (- miss 1) cann 1) successors))
+		(format t "Moving 1 missionary: ~S~%" successors))
+
 		;move 1 cannibal
+		(when (and (eql boat 0) (>= cann 1))
+			(setq successors (cons (list miss (- cann 1) 1) successors))
+		(format t "Moving 1 cannibal: ~S~%" successors))
 
 		;move 1 missionary back
 		(when (and (eql boat 1) (> *missionaries* (first state)))
-			(setq succs (cons (list (incf miss) cann 0) succs))
-		(format t "Moving 1 missionary back: ~S~%" succs))
+			(setq successors (cons (list (incf miss) cann 0) successors))
+		(format t "Moving 1 missionary back: ~S~%" successors))
 
 		;move 1 cannibal back
 		(when (and (eql boat 1) (> *cannibals* (second state)))
-			(setq succs (cons (list miss (incf cann) 0) succs))
-		(format t "Moving 1 cannibals back: ~S~%" succs))
+			(setq successors (cons (list miss (incf cann) 0) successors))
+		(format t "Moving 1 cannibals back: ~S~%" successors))
+
+		;move 1 of each back
+		(when (and 
+			(eql boat 1) 
+			(<= (- *missionaries* miss) 1)
+			(>= (- *cannibals* cann) 1)
+		      )
+			(setq successors 
+				(cons (list (decf miss) (decf cann) 1) successors))
+		(format t "Moving 1 of each back: ~S~%" successors))
 
 		;return list of successors, without duplicates
-		(remove-duplicates succs :test #'equal)
-|#
-		(nreverse succs)
-		(format t "Reversed succs: ~S~%" succs)
-		(format t "First succs ~S~%" (first succs))
-		(format t "What is in correct path ~S~%" correct-path)
-		#|(loop while (or 
-				(not (equalp goal-state (first succs)))
+		(remove-duplicates successors :test #'equal)
+
+		(nreverse successors)
+		;(format t "Reversed successors: ~S~%" successors)
+		;(format t "First successors ~S~%" (first successors))
+		;(format t "What is in correct path ~S~%" correct-path)
+		(loop while (and 
+				(not (equalp goal-state (first successors)))
 				(not done)
 			    )
 					 do
-			(setf miss (first (first succs)))
-			(setf cann (second (first succs)))
-			(format t "Miss: ~S~%" miss)
-			(format t "Cann: ~S~%" cann)
+			(setf miss (first (first successors)))
+			(setf cann (second (first successors)))
+			;(format t "Miss: ~S~%" miss)
+			;(format t "Cann: ~S~%" cann)
 			(cond 
 				((or (> miss cann) (equalp miss 0))
-					(setq correct-path (first succs))
-					(setq done (generate-successors (first succs)))
+					(nconc correct-path (list (first successors)))
+					(setq done 
+					(generate-successors (first successors)))
 				)
-				(t (pop succs))
+				(t (pop successors))
 			)
-		)|#
-		(setq correct-path (first succs))
-		(return-from generate-successors)
-		(setf done t)
+		)
+		(return-from generate-successors 1)
 	)	
 )
 
