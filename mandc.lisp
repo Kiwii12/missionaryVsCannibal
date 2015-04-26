@@ -159,14 +159,22 @@
 			(loop as j from 0 to length-of-l-bank do
 				(cond 
 					((equalp (first temp-path)(first l-bank))
-						(pop l-bank))
+						(pop l-bank)
+						(nconc temp-path (list (first temp-path)))
+						(pop temp-path)
+						(setf length-of-l-bank (length l-bank))
+					)
 					(t
 						(nconc temp-path (list (first temp-path)))
 						(pop temp-path)
 					)
 				)
 			)
+			(nconc l-bank (list (first l-bank)))
+			(pop l-bank)
 		)
+		(nconc l-bank (list (first l-bank)))
+		(pop l-bank)
 		(loop while (and (not (equal goal-state (first l-bank))) (not done)) do
 			(setf miss (first (first l-bank)))
 			(setf cann (second (first l-bank)))
