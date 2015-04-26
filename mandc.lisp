@@ -35,7 +35,7 @@
 	(setq *cannibals* cannibals)
 	;Have we reached the goal? (all missionaries and cannibals on the right bank)
 	(setf goal-state '(0 0 1))
-	(setf right-bank '(0 0))
+	(setf r-bank '(0 0))
 
 	;Solve missionaries and cannibals problem using DFS
         (setf start-state '(0 0 0))
@@ -47,11 +47,13 @@
         (format t "Missionaries ~S~%" missionaries)
         (format t "Cannibals ~S~%" cannibals)
         (format t "Start-state ~S~%" start-state)
-	(setf correct-path (list start-state))
+	(setf left-bank (list start-state))
+	(setf right-bank (list (list 0 0)))
 	(cond 
-		((generate-left-bank start-state right-bank)
+		((generate-l-bank start-state r-bank)
 			(format t "Success!~%")
-			(format t "Path: ~S~%" correct-path))
+			(format t "Left-bank Path: ~S~%" left-bank)
+			(format t "Right-bank Path: ~S~%" right-bank))
 		(t
 			(format t "Failure!~%")
 			(format t "No possible solutions~%")
@@ -62,164 +64,139 @@
 	(values)
 )
 
-;generate-left-bank returns a list of successor to the current state.
-(defun generate-left-bank (left-bank right-bank)
+;generate-l-bank returns a list of successor to the current state.
+(defun generate-l-bank (l-bank r-bank)
 	;define local variables
-	(let ((miss (first left-bank)) (cann (second left-bank)) (boat (third left-bank)) 
-		(m (first right-bank)) (c (second right-bank)) 
-		(left-bank nil) (right-bank nil))
+	(let ((miss (first l-bank)) (cann (second l-bank)) 
+		(boat (third l-bank)) (m (first r-bank)) (c (second r-bank)) 
+		(l-bank nil) (r-bank nil))
 
 		(setf done nil)
 
 		;(format t "Boat: ~S~%" boat)
-		;(format t "left-bank: ~S~%" left-bank)
-		(format t "correct-path ~S~%" correct-path)
+		(format t "l-bank: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
+		(format t "left-bank ~S~%" left-bank)
+		(format t "right-bank ~S~%" right-bank)
 
 		;move 2 missionaries
-		(cond ((and (= boat 0)(>= miss 2))
-			(setq left-bank  (cons (list (- miss 2) cann 1) left-bank))
-			(setq right-bank 
-				(cons 
-					(list (+ 2 m) 
-					(- *cannibals* cann)
-				) right-bank)
-			)
-		(format t "Moving 2 missionaries: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+		(cond ((and (= boat 0)(>= miss 2)(>= (- miss 2) cann))
+			(setq l-bank  (cons (list (- miss 2) cann 1) l-bank))
+			(setq r-bank (cons (list (+ 2 m) (- *cannibals* cann)) r-bank))
+		(format t "Moving 2 missionaries: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
 		;move 2 cannibals
 		(cond ((and (= boat 0) (>= cann 2))
-			(setq left-bank  (cons (list miss (- cann 2) 1) left-bank))
-			(setq right-bank 
-				(cons 
-					(list (- *missionaries* miss) 
-					(+ 2 c)
-				) right-bank)
-			)
-		(format t "Moving 2 cannibals: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+			(setq l-bank (cons (list miss (- cann 2) 1) l-bank))
+			(setq r-bank (cons (list (- *missionaries* miss) (+ 2 c)) r-bank))
+		(format t "Moving 2 cannibals: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
 		;move 1 of each
 		(cond ((and (= boat 0) (>= miss 1)(>= cann 1))
-			(setq left-bank 
-				(cons (list (decf miss) (decf cann) 1) left-bank))
-			(setq right-bank 
-				(cons 
-					(list (+ 1 m) 
-					(+ 1 c)
-				) right-bank)
-			)
-		(format t "Moving 1 of each: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+			(setq l-bank (cons (list (- miss 1) (- cann 1) 1) l-bank))
+			(setq r-bank (cons (list (+ 1 m)(+ 1 c)) r-bank))
+		(format t "Moving 1 of each: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
 		;move 1 missionary
-		(cond ((and (= boat 0)(>= miss 1))
-			(setq left-bank (cons (list (- miss 1) cann 1) left-bank))
-			(setq right-bank 
-				(cons 
-					(list (+ 1 m) 
-					(- *cannibals* cann)
-				) right-bank)
-			)
-		(format t "Moving 1 missionary: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+		(cond ((and (= boat 0)(>= miss 1)(>= (- miss 1) cann))
+			(setq l-bank (cons (list (- miss 1) cann 1) l-bank))
+			(setq r-bank (cons (list (+ 1 m)c) r-bank))
+		(format t "Moving 1 missionary: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
 		;move 1 cannibal
 		(cond ((and (= boat 0) (>= cann 1))
-			(setq left-bank (cons (list miss (- cann 1) 1) left-bank))
-			(setq right-bank 
-				(cons 
-					(list (- *missionaries* miss) 
-					(+ 1 c)
-				) right-bank)
-			)
-		(format t "Moving 1 cannibal: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+			(setq l-bank (cons (list miss (- cann 1) 1) l-bank))
+			(setq r-bank (cons (list m (+ 1 c)) r-bank))
+		(format t "Moving 1 cannibal: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
 		;move 1 missionary back
-		(cond ((and (= boat 1) (> *missionaries* (first state)))
-			(setq left-bank (cons (list (incf miss) cann 0) left-bank))
-			(setq right-bank 
-				(cons 
-					(list (+ 1 m) 
-					(- *cannibals* cann)
-				) right-bank)
-			)
-		(format t "Moving 1 missionary back: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+		(cond ((and (= boat 1) (>= m 1))
+			(setq l-bank (cons (list (+ miss 1) cann 0) l-bank))
+			(setq r-bank (cons (list (- m 1) c) r-bank))
+		(format t "Moving 1 missionary back: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
 		;move 1 cannibal back
-		(cond ((and (= boat 1) (> *cannibals* (second state)))
-			(setq left-bank (cons (list miss (incf cann) 0) left-bank))
-			(setq right-bank 
-				(cons 
-					(list (- *missionaries* miss) 
-					(- 1 c)
-				) right-bank)
-			)
-		(format t "Moving 1 cannibals back: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+		(cond ((and (= boat 1) (>= c 1))
+			(setq l-bank (cons (list miss (+ cann 1) 0) l-bank))
+			(setq r-bank (cons (list m (- c 1)) r-bank))
+		(format t "Moving 1 cannibals back: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
 		;move 1 of each back
 		(cond ((and (= boat 1) 
-			(> *missionaries* (first state)) 
-			(> *cannibals* (second state)))
-				(setq left-bank 
-					(cons (list (decf miss) (decf cann) 1) left-bank))
-				(setq right-bank 
-					(cons 
-						(list (- 1 m) 
-						(- 1 c)
-					) right-bank)
-				)
-		(format t "Moving 1 of each back: ~S~%" left-bank)
-		(format t "Right-bank: ~S~%" right-bank)
+			(>= m 1)
+			(>= c 1))
+				(setq l-bank (cons (list (+ miss 1)(+ cann 1) 0) l-bank))
+				(setq r-bank (cons (list (- m 1)(- c 1)) r-bank))
+		(format t "Moving 1 of each back: ~S~%" l-bank)
+		(format t "r-bank: ~S~%" r-bank)
 		))
 
-		;return list of left-bank, without duplicates
-		(remove-duplicates left-bank :test #'equal)
+		;return list of l-bank, without duplicates
+		(remove-duplicates l-bank :test #'equal)
 
-		(nreverse left-bank)
-		;(format t "Reversed left-bank: ~S~%" left-bank)
-		;(format t "First left-bank ~S~%" (first left-bank))
-		;(format t "What is in correct path ~S~%" correct-path)
-		(loop while (and 
-				(not (equal goal-state (first left-bank)))
-				(not done)
-			    )
-					 do
-			(setf miss (first (first left-bank)))
-			(setf cann (second (first left-bank)))
-			(setf m (first (first right-bank)))
-			(setf m (first (first right-bank)))
-			(format t "Miss: ~S~%" miss)
-			(format t "Cann: ~S~%" cann)
-			(format t "M: ~S~%" m)
-			(format t "C: ~S~%" c)
-			(cond (
-				(or (and (< miss cann) (not (= miss 0))) 
-					(and (< m c) (not (= m 0)))
-					(format t "test~%")
-					(pop left-bank)
-				))
-				(t (nconc correct-path (list (first left-bank)))
-					(setq done 
-						(generate-left-bank (first left-bank)
-							(first right-bank)))
-					(when done (return-from generate-left-bank 1))
-					(format t "double test")
+		(nreverse l-bank)
+		(nreverse r-bank)
+		(format t "triple test~%")
+		(setf temp-path (copy-list left-bank))
+		(setf length-of-left-bank (length temp-path))
+		(setf length-of-l-bank (length l-bank))
+		;To catch the inifite loop
+		(loop as i from 0 to length-of-left-bank do 
+			(loop as j from 0 to length-of-l-bank do
+				(cond 
+					((equalp (first temp-path)(first l-bank))
+						(pop l-bank))
+					(t
+						(nconc temp-path (list (first temp-path)))
+						(pop temp-path)
+					)
 				)
 			)
-			(when (eq left-bank NIL) (return-from generate-left-bank NIL))
 		)
-		(return-from generate-left-bank 1)
+		(loop while (and (not (equal goal-state (first l-bank))) (not done)) do
+			(setf miss (first (first l-bank)))
+			(setf cann (second (first l-bank)))
+			(setf m (first (first r-bank)))
+			(setf c (second (first r-bank)))
+			(format t "miss: ~S~%" miss)
+			(format t "cann: ~S~%" cann)
+			(format t "m: ~S~%" m)
+			(format t "c: ~S~%" c)
+			(cond
+				((or (and (< miss cann) (not(= miss 0))) 
+					(and (< m c) (not(= m 0))))
+					(format t "test~%")
+					(pop l-bank)
+					(pop r-bank)
+				)
+				
+				(t
+					(format t "double test~%")
+					(nconc left-bank (list (first l-bank)))
+					(nconc right-bank (list (first r-bank)))
+					(setq done 
+						(generate-l-bank (first l-bank)
+							(first r-bank)))
+					(when done (return-from generate-l-bank 1))
+				)
+			)
+			(when (eq l-bank NIL) (return-from generate-l-bank NIL))
+		)
+		(return-from generate-l-bank 1)
 	)	
 )
 
