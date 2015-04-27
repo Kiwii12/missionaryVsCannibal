@@ -3,6 +3,19 @@
 (defvar *cannibals*)	;Number of cannibals
 (defvar *fail-count*)	;Count of attemps using the same case to trap loop
 
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
+|	MAIN 
+|
+|	Authors-	Jason Anderson and Johnathan Ackerman
+|
+|	Description-	This function initiallizes the global variables used by
+|				the program. It also outputs the usage statement and prints
+|				out the table showing a solution for how the missionaries and
+|				cannibals get across the river.
+|
+|	Param(in)-	*args* - list holds the initial values for *cannibals* and
+|							*missionaries*
+|##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;main program
 (defun main()
 ;if args not equal to 2 return
@@ -25,6 +38,20 @@
 	)
 )
 
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
+|	M-C 
+|
+|	Authors-	Jason Anderson and Johnathan Ackerman
+|
+|	Description-	This function starts the recursive calls and determines if
+|				the a potential path is possible.
+|
+|	Param(in)-	cannibals - the number of flesh eating heathens starting 
+|								on the left bank hoping for a quick 
+|								religious meal
+|	Param(in)-	missionaries - the number of religious folk attempting 
+|									to "save" flesh eating heathens
+|##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;Missionaries and Cannibals problem
 (defun m-c (missionaries cannibals)
 	;check for unsolvable problem instance
@@ -49,6 +76,23 @@
 	(values)
 )
 
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
+|	LEFT-BANK 
+|
+|	Authors-	Jason Anderson and Johnathan Ackerman
+|
+|	Description-	This function determins what cases are valid and calls
+|				right-bank to send the boat across the river.
+|
+|	Param(in)-	cann - the number of flesh eating heathens starting on the 
+|							left bank hoping for a quick religious meal
+|	Param(in)-	miss - the number of religious folk attempting to "save" 
+|							flesh eating heathens
+|
+|	returns t-  the right bank returned true meaning a solution has been found
+|
+|	returns nil- no possible solution
+|##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 (defun left-bank (miss cann)
 	(setf m miss)
 	(setf c cann)
@@ -112,6 +156,23 @@
 	(return-from left-bank NIL)
 )
 
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
+|	RIGHT-BANK 
+|
+|	Authors-	Jason Anderson and Johnathan Ackerman
+|
+|	Description-	This function determins what cases are valid and calls
+|				left-bank to send the boat across the river.
+|
+|	Param(in)-	cann - the number of flesh eating heathens starting on the 
+|							left bank hoping for a quick religious meal
+|	Param(in)-	miss - the number of religious folk attempting to "save" 
+|							flesh eating heathens
+|
+|	returns t-  the right bank returned true meaning a solution has been found
+|
+|	returns nil- no possible solution
+|##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 (defun right-bank (miss cann)
 	(setf m miss)
 	(setf c cann)
