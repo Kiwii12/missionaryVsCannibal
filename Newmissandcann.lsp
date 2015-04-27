@@ -1,6 +1,7 @@
 ;Global Variables
 (defvar *missionaries*)	;Number of missionaries
 (defvar *cannibals*)	;Number of cannibals
+(defvar *fail-count*)	;Count of attemps using the same case to trap loop
 
 ;main program
 (defun main()
@@ -33,6 +34,7 @@
 	;initialize global variables
 	(setf *missionaries* missionaries)
 	(setf *cannibals* cannibals)
+	(setf *fail-count* 0)
 
 	(cond 
 		((left-bank *missionaries* *cannibals*)
@@ -74,11 +76,15 @@
 	)
 
 	(when done (return-from left-bank 1))
+
+
 	;move 1 of each
 	(when	(and	(>= (- m 1) 0) (>= (- c 1) 0) 
 			(<= (+ r-miss 1) *missionaries*) (<= (+ r-cann 1) *cannibals*)
 		)
 		(format t "To right bank from move 1 of each~%")
+		(format t "fail-count = " *fail-count* "-%")
+		(when (>= *fail-count* 5) (return-from left-bank nil))
 		(setf done(right-bank (- m 1) (- c 1)))
 	)
 	(when done (return-from left-bank 1))
@@ -100,6 +106,7 @@
 		(format t "To right bank from move 1 cannibals~%")
 		(setf done (right-bank m (- c 1)))
 	)
+	(when done (return-from left-bank 1))
 
 	(format t "No move found from left.  Exiting.~%")
 	(return-from left-bank NIL)
@@ -119,6 +126,7 @@
 			(>= (+ m 1) c) (or (>= (- r-miss 1) r-cann)(= r-miss 0))
 		)
 		(format t "To left bank from move 1 missionary back~%")
+		(setf *fail-count* 0)
 		(setf done (left-bank (+ m 1) c))
 	)
 	(when done (return-from right-bank 1))
@@ -129,6 +137,7 @@
 			(or (>= r-miss (- r-cann 1))(= r-miss 0))
 		)
 		(format t "To left bank from move 1 cannibal back~%")
+		(setf *fail-count* 0)
 		(setf done (left-bank m (+ c 1)))
 	)
 	(when done (return-from right-bank 1))
@@ -138,6 +147,8 @@
 			(>= (- r-miss 1) 0) (>= (- r-cann 1) 0)
 		)
 		(format t "To left bank from move 1 of each back~%")
+		(incf *fail-count*)
+		(when (>= *fail-count* 5) (return-from right-bank nil))
 		(setf done (left-bank (+ m 1) (+ c 1)))
 	)
 	(when done (return-from right-bank 1))
