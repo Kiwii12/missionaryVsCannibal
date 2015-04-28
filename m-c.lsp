@@ -47,16 +47,16 @@
 |				the a potential path is possible.
 |
 |	Param(in)-	cannibals - the number of flesh eating heathens starting 
-|								on the left bank hoping for a quick 
+|					on the left bank hoping for a quick 
 |								religious meal
 |	Param(in)-	missionaries - the number of religious folk attempting 
-|									to "save" flesh eating heathens
+|					to "save" flesh eating heathens
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;Missionaries and Cannibals problem
 (defun dfs (missionaries cannibals)
 	;check for unsolvable problem instance
 	(when (and (< missionaries cannibals) (not (= missionaries 0)))
-		(return-from dfs "Too few missionaries!"))
+		(return-from dfs (format t "Too few missionaries!")))
 
 	;initialize global variables
 	(setf *missionaries* missionaries)
@@ -88,7 +88,7 @@
 |				right-bank to send the boat across the river.
 |
 |	Param(in)-	cann - the number of flesh eating heathens starting on the 
-|							left bank hoping for a quick religious meal
+|				left bank hoping for a quick religious meal
 |	Param(in)-	miss - the number of religious folk attempting to "save" 
 |							flesh eating heathens
 |	Param(in/out)-	solution - list of values related to the path across
