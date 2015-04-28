@@ -274,7 +274,7 @@
 (defun print-solution (solution)
 	(setf end (pop solution))
 	(when (equalp end NIL) (return-from print-solution NIL))
-	(format t "~S M, ~S C		~S M, ~S C		"
+	(format t "~S M, ~S C	~S M, ~S C	"
 		(pop solution)(pop solution)(pop solution)(pop solution))
 	(setf boat (pop solution))
 	(when (= boat 0) (format t "Left  	"))
