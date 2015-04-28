@@ -9,12 +9,13 @@
 |	Authors-	Jason Anderson and Johnathan Ackerman
 |
 |	Description-	This function initiallizes the global variables used by
-|				the program. It also outputs the usage statement and prints
-|				out the table showing a solution for how the missionaries and
+|				the program. It also outputs the usage 
+|				statement and prints out the table showing a 
+|				solution for how the missionaries and
 |				cannibals get across the river.
 |
-|	Param(in)-	*args* - list holds the initial values for *cannibals* and
-|							*missionaries*
+|	Param(in)-	*args* - list holds the initial values for *cannibals* 
+|					and *missionaries*
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;main program
 (defun m-c()
@@ -31,9 +32,10 @@
 			(format t "~%Missionary vs Cannibal problem~%")
 			(format t "---------- -- -------- -------~%~%")
 			(format t "Usage: (m-c missionaries cannibals)~%")
-			(format t "	missionaries - number of missionaries trying to cross~%")
-			(format t "	cannibals    - number of cannibals trying to cross~%~%")
-			;(error "Incorrect number of command line arguments~%~%")
+			(format t 
+	"	missionaries - number of missionaries trying to cross~%")
+			(format t 
+	"	cannibals    - number of cannibals trying to cross~%~%")
 		)
 	)
 )
@@ -43,12 +45,13 @@
 |
 |	Authors-	Jason Anderson and Johnathan Ackerman
 |
-|	Description-	This function starts the recursive calls and determines if
-|				the a potential path is possible.
+|	Description-	This function starts the recursive calls and 
+|				determines if the a potential path is 
+|				possible.
 |
-|	Param(in)-	cannibals - the number of flesh eating heathens starting 
-|					on the left bank hoping for a quick 
-|								religious meal
+|	Param(in)-	cannibals - the number of flesh eating heathens 
+|				starting on the left bank hoping for a quick 
+|				religious meal
 |	Param(in)-	missionaries - the number of religious folk attempting 
 |					to "save" flesh eating heathens
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
@@ -63,16 +66,16 @@
 	(setf solution '(0))
 
 	(cond 
-		((left-bank *missionaries* *cannibals* solution)
-			(format t "left bank 	right bank 	canoe 	next move~%")
-			(format t "--------- 	---------- 	----- 	---------~%")
+	    ((left-bank *missionaries* *cannibals* solution)
+		(format t "left bank 	right bank 	canoe 	next move~%")
+		(format t "--------- 	---------- 	----- 	---------~%")
 			(pop solution)
 			(print-solution solution)
-		)
-		(t
-			(format t "Failure!~%")
-			(format t "No possible solutions~%")
-		)
+	    )
+	    (t
+		(format t "Failure!~%")
+		(format t "No possible solutions~%")
+	    )
 	)
 
 	;suppress printing NIL upon return to interpreter
@@ -87,13 +90,15 @@
 |	Description-	This function determines what cases are valid and calls
 |				right-bank to send the boat across the river.
 |
-|	Param(in)-	cann - the number of flesh eating heathens starting on the 
-|				left bank hoping for a quick religious meal
-|	Param(in)-	miss - the number of religious folk attempting to "save" 
-|							flesh eating heathens
+|	Param(in)-	cann - the number of flesh eating heathens starting 
+|				on the left bank hoping for a quick 
+|				religious meal
+|	Param(in)-	miss - the number of religious folk attempting to 
+|					"save" flesh eating heathens
 |	Param(in/out)-	solution - list of values related to the path across
 |
-|	returns t-  the right bank returned true meaning a solution has been found
+|	returns t-  the right bank returned true meaning a solution has been 
+|			found
 |
 |	returns nil- no possible solution
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
@@ -106,7 +111,10 @@
 
 	;move 2 missionaries
 	(when	(and 	(>= (- m 2) 0) (<= (+ r-miss 2) *missionaries*) 
-			(or (>= (- m 2) c) (= (- m 2) 0)) (>= (+ r-miss 2) r-cann)
+			(or 
+				(>= (- m 2) c) 
+				(= (- m 2) 0)) 
+				(>= (+ r-miss 2) r-cann)
 		)
 		(format-solution m c 0 0 solution)
 		(setf done (right-bank (- m 2) c solution))
@@ -126,7 +134,8 @@
 
 	;move 1 of each
 	(when	(and	(>= (- m 1) 0) (>= (- c 1) 0) 
-			(<= (+ r-miss 1) *missionaries*) (<= (+ r-cann 1) *cannibals*)
+			(<= (+ r-miss 1) *missionaries*) 
+			(<= (+ r-cann 1) *cannibals*)
 		)
 		(when (>= *fail-count* 5) (return-from left-bank nil))
 		(format-solution m c 0 2 solution)
@@ -136,7 +145,10 @@
 
 	;move 1 missionaries
 	(when	(and 	(>= (- m 1) 0) (<= (+ r-miss 1) *missionaries*) 
-			(or (>= (- m 1) c) (= (- m 1) 0)) (>= (+ r-miss 1) r-cann)
+			(or 
+			(>= (- m 1) c) 
+			(= (- m 1) 0)) 
+			(>= (+ r-miss 1) r-cann)
 		)
 		(format-solution m c 0 3 solution)
 		(setf done (right-bank (- m 1) c solution))
@@ -164,13 +176,15 @@
 |	Description-	This function determines what cases are valid and calls
 |				left-bank to send the boat across the river.
 |
-|	Param(in)-	cann - the number of flesh eating heathens starting on the 
-|							left bank hoping for a quick religious meal
-|	Param(in)-	miss - the number of religious folk attempting to "save" 
-|							flesh eating heathens
+|	Param(in)-	cann - the number of flesh eating heathens starting 
+|				on the left bank hoping for a quick 
+|				religious meal
+|	Param(in)-	miss - the number of religious folk attempting to 
+|					"save" flesh eating heathens
 |	Param(in/out)-	solution - list of values related to the path across
 |
-|	returns t-  the right bank returned true meaning a solution has been found
+|	returns t-  the right bank returned true meaning a solution has been 
+|			found
 |
 |	returns nil- no possible solution
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
@@ -185,7 +199,8 @@
 
 	;move 1 missionary back
 	(when 	(and	(>= *missionaries* m) (>= (- r-miss 1) 0)
-			(>= (+ m 1) c) (or (>= (- r-miss 1) r-cann)(= r-miss 0))
+			(>= (+ m 1) c) 
+			(or (>= (- r-miss 1) r-cann)(= r-miss 0))
 		)
 		(setf *fail-count* 0)
 		(format-solution m c 1 5 solution)
@@ -227,16 +242,18 @@
 |				solution is called it knows where to find the 
 |				information to print out
 |
-|	Param(in)-	cann - the number of flesh eating heathens starting on the 
-|							left bank hoping for a quick religious meal
+|	Param(in)-	cann - the number of flesh eating heathens starting 
+|					on the left bank hoping for a quick 
+|					religious meal
 |
-|	Param(in)-	miss - the number of religious folk attempting to "save" 
-|							flesh eating heathens
+|	Param(in)-	miss - the number of religious folk attempting to 
+|					"save" flesh eating heathens
 |
-|	Param(in)-	right - A boolean value representing which side of the river
-|					the boat is on
+|	Param(in)-	right - A boolean value representing which side of the 
+|					river the boat is on
 |
-|	Param(in)-	move - The code for print-solution for which move was last made
+|	Param(in)-	move - The code for print-solution for which move 
+|					was last made
 |
 |	Param(out)-	solution - where the path information is stored
 |
@@ -246,7 +263,8 @@
 (defun format-solution (miss cann right move solution)
 	(setf path 0)
 	(setf path (list 0 miss cann 
-			(- *missionaries* miss) (- *cannibals* cann) right move))
+			(- *missionaries* miss) 
+			(- *cannibals* cann) right move))
 	(nconc solution path)
 	(return-from format-solution 1)
 )
@@ -260,7 +278,8 @@
 |
 |	Param(in)-	solution - holds the path for the solution
 |
-|	returns t-  returns nil when there is no more moves in the solution varibal
+|	returns t-  returns nil when there is no more moves in the solution 
+|			varibal
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 (defun print-solution (solution)
 	(setf end (pop solution))
@@ -271,15 +290,24 @@
 	(when (= boat 0) (format t "Left  	"))
 	(when (= boat 1) (format t "Right 	"))
 	(setf move (pop solution))
-	(when (= move 0) (format t "Move 2 missionaries from left to right~%"))
-	(when (= move 1) (format t "Move 2 cannibals from left to right~%"))
-	(when (= move 2) (format t "Move 1 of each from left to right~%"))
-	(when (= move 3) (format t "Move 1 missionary from left to right~%"))
-	(when (= move 4) (format t "Move 1 cannibal from left to right~%"))
-	(when (= move 5) (format t "Move 1 missionary from right to left~%"))
-	(when (= move 6) (format t "Move 1 cannibal from right to left~%"))
-	(when (= move 7) (format t "Move 1 of each from right to left~%"))
-	(when (= move 10) (format t "Success!~%"))
+	(when (= move 0) 
+		(format t "Move 2 missionaries from left to right~%"))
+	(when (= move 1) 
+		(format t "Move 2 cannibals from left to right~%"))
+	(when (= move 2) 
+		(format t "Move 1 of each from left to right~%"))
+	(when (= move 3) 
+		(format t "Move 1 missionary from left to right~%"))
+	(when (= move 4) 
+		(format t "Move 1 cannibal from left to right~%"))
+	(when (= move 5) 
+		(format t "Move 1 missionary from right to left~%"))
+	(when (= move 6) 
+		(format t "Move 1 cannibal from right to left~%"))
+	(when (= move 7) 
+		(format t "Move 1 of each from right to left~%"))
+	(when (= move 10) 
+		(format t "Success!~%"))
 	(print-solution solution)
 )
 
