@@ -228,7 +228,7 @@
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
 |	FORMAT-SOLUTION
 |
-|	Authors-	Jason Anderson and Johnathan Ackerman
+|	Authors-	Jason Anderson
 |
 |	Description-	This function formats the solution for when the print 
 |				solution is called it knows where to find the 
@@ -261,7 +261,7 @@
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
 |	PRINT-SOLUTION
 |
-|	Authors-	Jason Anderson and Johnathan Ackerman
+|	Authors-	Jason Anderson
 |
 |	Description-	This function prints out the solution formatted nicely
 |
