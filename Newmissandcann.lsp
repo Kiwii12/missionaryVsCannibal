@@ -62,10 +62,7 @@
 
 	;initialize global variables
 	(setf *missionaries* missionaries)
-	;(setf *cannibals* cannibals)
 	(setf solution '(0))
-	;(setf *fail-count* 0)
-	(format t "before cond ~S~%" solution)
 
 	(cond 
 		((left-bank *missionaries* *cannibals* solution)
@@ -96,6 +93,7 @@
 |							left bank hoping for a quick religious meal
 |	Param(in)-	miss - the number of religious folk attempting to "save" 
 |							flesh eating heathens
+|	Param(in/out)-	solution - list of values related to the path across
 |
 |	returns t-  the right bank returned true meaning a solution has been found
 |
@@ -175,6 +173,7 @@
 |							left bank hoping for a quick religious meal
 |	Param(in)-	miss - the number of religious folk attempting to "save" 
 |							flesh eating heathens
+|	Param(in/out)-	solution - list of values related to the path across
 |
 |	returns t-  the right bank returned true meaning a solution has been found
 |
@@ -236,7 +235,7 @@
 |				information to print out
 |
 |	Param(in)-	cann - the number of flesh eating heathens starting on the 
-|							left bank hoping for a quick |							religious meal
+|							left bank hoping for a quick religious meal
 |
 |	Param(in)-	miss - the number of religious folk attempting to "save" 
 |							flesh eating heathens
