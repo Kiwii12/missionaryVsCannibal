@@ -1,8 +1,8 @@
 ;Global Variables
-(defvar *missionaries*)	;Number of missionaries
-(defvar *cannibals*)	;Number of cannibals
-(defvar *solution*)	;solution path
-(defvar *fail-count*)	;Count of attemps using the same case to trap loop
+(defvar *missionaries* 0)	;Number of missionaries
+(defvar *cannibals* 0)	;Number of cannibals
+;(defvar *solution* 0)	;solution path
+(defvar *fail-count* NIL)	;Count of attemps using the same case to trap loop
 
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
 |	MAIN 
@@ -25,6 +25,7 @@
 		;initializes globals
 			(setf *missionaries* (parse-integer (first *args*)) 
 			*cannibals* (parse-integer (second *args*)))
+			(setf *solution* NIL)
 			(m-c *missionaries* *cannibals*)
 		)
 		;or print usage
@@ -62,15 +63,16 @@
 	;initialize global variables
 	(setf *missionaries* missionaries)
 	(setf *cannibals* cannibals)
-	(setf *solution* '(0))
+	(setf solution '(0))
 	(setf *fail-count* 0)
+	(format t "before cond ~S~%" solution)
 
 	(cond 
-		((left-bank *missionaries* *cannibals*)
+		((left-bank *missionaries* *cannibals* solution)
 			(format t "left bank right bank canoe next move~%")
 			(format t "--------- ---------- ----- ---------~%")
-			(pop *solution*)
-			(print-solution)
+			(pop solution)
+			(print-solution solution)
 		)
 		(t
 			(format t "Failure!~%")
@@ -99,7 +101,7 @@
 |
 |	returns nil- no possible solution
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-(defun left-bank (miss cann)
+(defun left-bank (miss cann solution)
 	(setf m miss)
 	(setf c cann)
 	(setf r-miss (- *missionaries* miss))
@@ -111,8 +113,8 @@
 			(or (>= (- m 2) c) (= (- m 2) 0)) (>= (+ r-miss 2) r-cann)
 		)
 		;(format t "To right bank from move 2 missionaries~%")
-		(format-solution m c 0 0)
-		(setf done (right-bank (- m 2) c))
+		(format-solution m c 0 0 solution)
+		(setf done (right-bank (- m 2) c solution))
 	)
 	(when done (return-from left-bank 1))
 
@@ -122,8 +124,8 @@
 			(or (>= r-miss (+ r-cann 2)) (= r-miss 0))
 		)
 		;(format t "To right bank from move 2 cannibals~%")
-		(format-solution m c 0 1)
-		(setf done (right-bank m (- c 2)))
+		(format-solution m c 0 1 solution)
+		(setf done (right-bank m (- c 2) solution))
 	)
 	(when done (return-from left-bank 1))
 
@@ -135,8 +137,8 @@
 		;(format t "To right bank from move 1 of each~%")
 		;(format t "fail-count = " *fail-count* "~%")
 		(when (>= *fail-count* 5) (return-from left-bank nil))
-		(format-solution m c 0 2)
-		(setf done(right-bank (- m 1) (- c 1)))
+		(format-solution m c 0 2 solution)
+		(setf done(right-bank (- m 1) (- c 1) solution))
 	)
 	(when done (return-from left-bank 1))
 
@@ -145,8 +147,8 @@
 			(or (>= (- m 1) c) (= (- m 1) 0)) (>= (+ r-miss 1) r-cann)
 		)
 		;(format t "To right bank from move 1 missionaries~%")
-		(format-solution m c 0 3)
-		(setf done (right-bank (- m 1) c))
+		(format-solution m c 0 3 solution)
+		(setf done (right-bank (- m 1) c solution))
 	)
 	(when done (return-from left-bank 1))
 
@@ -156,8 +158,8 @@
 			(or (>= r-miss (+ r-cann 1)) (= r-miss 0))
 		)
 		;(format t "To right bank from move 1 cannibals~%")
-		(format-solution m c 0 4)
-		(setf done (right-bank m (- c 1)))
+		(format-solution m c 0 4 solution)
+		(setf done (right-bank m (- c 1) solution))
 	)
 	(when done (return-from left-bank 1))
 
@@ -182,13 +184,13 @@
 |
 |	returns nil- no possible solution
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-(defun right-bank (miss cann)
+(defun right-bank (miss cann solution)
 	(setf m miss)
 	(setf c cann)
 	(setf r-miss (- *missionaries* miss))
 	(setf r-cann (- *cannibals* cann))
 	(setf done NIL)
-	(when (and (= miss 0) (= cann 0)) (format-solution m c 1 10) 
+	(when (and (= miss 0) (= cann 0)) (format-solution m c 1 10 solution) 
 		(return-from right-bank 1))
 
 	;move 1 missionary back
@@ -197,8 +199,8 @@
 		)
 		;(format t "To left bank from move 1 missionary back~%")
 		(setf *fail-count* 0)
-		(format-solution m c 1 5)
-		(setf done (left-bank (+ m 1) c))
+		(format-solution m c 1 5 solution)
+		(setf done (left-bank (+ m 1) c solution))
 	)
 	(when done (return-from right-bank 1))
 
@@ -209,8 +211,8 @@
 		)
 		;(format t "To left bank from move 1 cannibal back~%")
 		(setf *fail-count* 0)
-		(format-solution m c 1 6)
-		(setf done (left-bank m (+ c 1)))
+		(format-solution m c 1 6 solution)
+		(setf done (left-bank m (+ c 1) solution))
 	)
 	(when done (return-from right-bank 1))
 
@@ -221,8 +223,8 @@
 		;(format t "To left bank from move 1 of each back~%")
 		(incf *fail-count*)
 		(when (>= *fail-count* 5) (return-from right-bank nil))
-		(format-solution m c 1 7)
-		(setf done (left-bank (+ m 1) (+ c 1)))
+		(format-solution m c 1 7 solution)
+		(setf done (left-bank (+ m 1) (+ c 1) solution))
 	)
 	(when done (return-from right-bank 1))
 
@@ -255,11 +257,11 @@
 |	returns t-  returns not NIL to get back into the body of the code
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;Store the solution path
-(defun format-solution (miss cann right move)
+(defun format-solution (miss cann right move solution)
 	(setf path 0)
 	(setf path (list 0 miss cann 
 			(- *missionaries* miss) (- *cannibals* cann) right move))
-	(nconc *solution* path)
+	(nconc solution path)
 	(return-from format-solution 1)
 )
 
@@ -270,20 +272,20 @@
 |
 |	Description-	This function prints out the solution formatted nicely
 |
-|	Param(in)-	*solution* - Global varibal holds the path for the solution
+|	Param(in)-	solution - holds the path for the solution
 |
-|	returns t-  returns nil when there is no more moves in the *solution* varibal
+|	returns t-  returns nil when there is no more moves in the solution varibal
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;format the path
-(defun print-solution ()
-	(setf end (pop *solution*))
+(defun print-solution (solution)
+	(setf end (pop solution))
 	(when (equalp end NIL) (return-from print-solution NIL))
 	(format t "~S M, ~S C  ~S M, ~S C   "
-		(pop *solution*)(pop *solution*)(pop *solution*)(pop *solution*))
-	(setf boat (pop *solution*))
+		(pop solution)(pop solution)(pop solution)(pop solution))
+	(setf boat (pop solution))
 	(when (= boat 0) (format t "Left  "))
 	(when (= boat 1) (format t "Right "))
-	(setf move (pop *solution*))
+	(setf move (pop solution))
 	(when (= move 0) (format t "Move 2 missionaries from left to right~%"))
 	(when (= move 1) (format t "Move 2 cannibals from left to right~%"))
 	(when (= move 2) (format t "Move 1 of each from left to right~%"))
@@ -293,8 +295,15 @@
 	(when (= move 6) (format t "Move 1 cannibal from right to left~%"))
 	(when (= move 7) (format t "Move 1 of each from right to left~%"))
 	(when (= move 10) (format t "Success!~%"))
-	(print-solution)
+	(print-solution solution)
 )
+
+#|;clear whatever is in solution
+(defun clear-solution ()
+	(setf clear (pop solution))
+	(when (equalp clear NIL) (return-from clear-solution (setf solution '(0))))
+	(clear-solution)
+)|#
 
 ;Run missionaries and cannibals automatically upon loading file
 (main)
