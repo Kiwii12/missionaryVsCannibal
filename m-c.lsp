@@ -5,7 +5,7 @@
 (defvar *fail-count* NIL)	;Count of attemps using the same case to trap loop
 
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
-|	MAIN 
+|	M-C 
 |
 |	Authors-	Jason Anderson and Johnathan Ackerman
 |
@@ -18,7 +18,7 @@
 |							*missionaries*
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;main program
-(defun main()
+(defun m-c()
 ;if args not equal to 2 return
 	(cond
 		((= (length *args*) 2) 
@@ -26,7 +26,7 @@
 			(setf *missionaries* (parse-integer (first *args*)) 
 			*cannibals* (parse-integer (second *args*)))
 			(setf *solution* NIL)
-			(m-c *missionaries* *cannibals*)
+			(dfs *missionaries* *cannibals*)
 		)
 		;or print usage
 		(t
@@ -41,7 +41,7 @@
 )
 
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
-|	M-C 
+|	dfs 
 |
 |	Authors-	Jason Anderson and Johnathan Ackerman
 |
@@ -55,10 +55,10 @@
 |									to "save" flesh eating heathens
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
 ;Missionaries and Cannibals problem
-(defun m-c (missionaries cannibals)
+(defun dfs (missionaries cannibals)
 	;check for unsolvable problem instance
 	(when (and (< missionaries cannibals) (not (= missionaries 0)))
-		(return-from m-c "Too few missionaries!"))
+		(return-from dfs "Too few missionaries!"))
 
 	;initialize global variables
 	(setf *missionaries* missionaries)
@@ -299,4 +299,4 @@
 )|#
 
 ;Run missionaries and cannibals automatically upon loading file
-(main)
+(m-c)
