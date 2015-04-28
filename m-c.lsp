@@ -1,8 +1,7 @@
 ;Global Variables
 (defvar *missionaries* 0)	;Number of missionaries
 (defvar *cannibals* 0)	;Number of cannibals
-;(defvar *solution* 0)	;solution path
-(defvar *fail-count* NIL)	;Count of attemps using the same case to trap loop
+(defvar *fail-count* 0)	;Count of attemps using the same case to trap loop
 
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||##||
 |	M-C 
@@ -25,7 +24,6 @@
 		;initializes globals
 			(setf *missionaries* (parse-integer (first *args*)) 
 			*cannibals* (parse-integer (second *args*)))
-			(setf *solution* NIL)
 			(dfs *missionaries* *cannibals*)
 		)
 		;or print usage
@@ -140,7 +138,6 @@
 	(when	(and 	(>= (- m 1) 0) (<= (+ r-miss 1) *missionaries*) 
 			(or (>= (- m 1) c) (= (- m 1) 0)) (>= (+ r-miss 1) r-cann)
 		)
-		;(format t "To right bank from move 1 missionaries~%")
 		(format-solution m c 0 3 solution)
 		(setf done (right-bank (- m 1) c solution))
 	)
@@ -151,13 +148,11 @@
 			(or (>= m (- c 1))(= m 0))
 			(or (>= r-miss (+ r-cann 1)) (= r-miss 0))
 		)
-		;(format t "To right bank from move 1 cannibals~%")
 		(format-solution m c 0 4 solution)
 		(setf done (right-bank m (- c 1) solution))
 	)
 	(when done (return-from left-bank 1))
 
-	;(format t "No move found from left.  Exiting.~%")
 	(return-from left-bank NIL)
 )
 
@@ -213,7 +208,6 @@
 	(when	(and	(>= *missionaries* (+ m 1)) (>= *cannibals* (+ c 1))
 			(>= (- r-miss 1) 0) (>= (- r-cann 1) 0)
 		)
-		;(format t "To left bank from move 1 of each back~%")
 		(incf *fail-count*)
 		(when (>= *fail-count* 5) (return-from right-bank nil))
 		(format-solution m c 1 7 solution)
@@ -221,7 +215,6 @@
 	)
 	(when done (return-from right-bank 1))
 
-	;(format t "No move found from right.  Exiting.~%")
 	(return-from right-bank NIL)
 )
 
@@ -245,7 +238,7 @@
 |
 |	Param(in)-	move - The code for print-solution for which move was last made
 |
-|	Param(out)-	*solution* - where the path information is stored
+|	Param(out)-	solution - where the path information is stored
 |
 |	returns t-  returns not NIL to get back into the body of the code
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
@@ -269,7 +262,6 @@
 |
 |	returns t-  returns nil when there is no more moves in the solution varibal
 |##|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-;format the path
 (defun print-solution (solution)
 	(setf end (pop solution))
 	(when (equalp end NIL) (return-from print-solution NIL))
@@ -291,12 +283,6 @@
 	(print-solution solution)
 )
 
-#|;clear whatever is in solution
-(defun clear-solution ()
-	(setf clear (pop solution))
-	(when (equalp clear NIL) (return-from clear-solution (setf solution '(0))))
-	(clear-solution)
-)|#
 
 ;Run missionaries and cannibals automatically upon loading file
 (m-c)
